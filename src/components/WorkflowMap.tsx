@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -16,11 +16,18 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { initialNodes, initialEdges } from '../data/workflowData';
+import { nodeDetails } from '../data/nodeDetails';
+import { NodeDetailsPanel } from './NodeDetailsPanel';
 
-const WorkflowMap = () => {
+interface WorkflowMapProps {
+  focusedNode?: string | null;
+}
+
+const WorkflowMap = ({ focusedNode }: WorkflowMapProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [isDetailPanelOpen, setIsDetailPanelOpen] = useState(false);
   
   const onConnect = useCallback((params: any) => {
     setEdges((eds) => addEdge({
@@ -34,7 +41,16 @@ const WorkflowMap = () => {
 
   const onNodeClick = useCallback((_: any, node: Node) => {
     setSelectedNode(node.id);
+    setIsDetailPanelOpen(true);
   }, []);
+  
+  // Effect to handle focused node from header
+  useEffect(() => {
+    if (focusedNode) {
+      setSelectedNode(focusedNode);
+      setIsDetailPanelOpen(true);
+    }
+  }, [focusedNode]);
 
   const getNodeColor = (type: string) => {
     switch(type) {
@@ -80,6 +96,10 @@ const WorkflowMap = () => {
       transition: 'opacity 0.3s ease',
     },
   }));
+  
+  const handleClosePanelDetails = () => {
+    setIsDetailPanelOpen(false);
+  };
 
   return (
     <div className="w-full h-[calc(100vh-100px)]">
@@ -109,7 +129,7 @@ const WorkflowMap = () => {
         />
         <Panel position="top-left" className="bg-white p-3 rounded-md shadow-md">
           <h3 className="text-xl font-bold mb-2">Product & UX System</h3>
-          <p className="text-sm text-gray-600">Click on nodes to explore connections</p>
+          <p className="text-sm text-gray-600">Click on nodes to explore connections and details</p>
           {selectedNode && (
             <button 
               className="mt-2 px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md text-sm"
@@ -120,6 +140,13 @@ const WorkflowMap = () => {
           )}
         </Panel>
       </ReactFlow>
+      
+      <NodeDetailsPanel 
+        isOpen={isDetailPanelOpen}
+        onClose={handleClosePanelDetails}
+        nodeDetail={selectedNode ? nodeDetails[selectedNode] : null}
+        nodeId={selectedNode}
+      />
     </div>
   );
 };

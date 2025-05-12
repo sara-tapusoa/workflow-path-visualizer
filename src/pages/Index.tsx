@@ -15,7 +15,7 @@ const Index = () => {
       <div className="container mx-auto p-4">
         <WorkflowHeader onFocusNode={handleFocusNode} />
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <WorkflowMap />
+          <WorkflowMap focusedNode={focusedNode} />
         </div>
         <div className="mt-4 text-center text-sm text-gray-500">
           Click and drag to move the canvas. Use mouse wheel to zoom in/out.
