@@ -8,10 +8,14 @@ interface EnhancedWorkflowHeaderProps extends WorkflowHeaderProps {
   onOpenEmbedDialog: () => void;
 }
 
-export function EnhancedWorkflowHeader({ onFocusNode, onOpenEmbedDialog }: EnhancedWorkflowHeaderProps) {
+export function EnhancedWorkflowHeader({ onFocusNode, onOpenEmbedDialog, onChangeView, currentView }: EnhancedWorkflowHeaderProps) {
   return (
     <div className="flex flex-wrap justify-between items-center mb-4">
-      <WorkflowHeader onFocusNode={onFocusNode} />
+      <WorkflowHeader 
+        onFocusNode={onFocusNode} 
+        onChangeView={onChangeView} 
+        currentView={currentView} 
+      />
       <Button 
         variant="outline" 
         className="ml-auto mb-2 flex items-center gap-2"

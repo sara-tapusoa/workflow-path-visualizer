@@ -16,18 +16,46 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { initialNodes, initialEdges } from '../data/workflowData';
+import { companyNodes, companyEdges } from '../data/companyLevelData';
+import { productNodes, productEdges } from '../data/productLevelData';
+import { dashboardNodes, dashboardEdges } from '../data/dashboardData';
 import { nodeDetails } from '../data/nodeDetails';
 import { NodeDetailsPanel } from './NodeDetailsPanel';
+import { WorkflowView } from './WorkflowHeader';
 
 interface WorkflowMapProps {
   focusedNode?: string | null;
+  currentView?: WorkflowView;
 }
 
-const WorkflowMap = ({ focusedNode }: WorkflowMapProps) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+const WorkflowMap = ({ focusedNode, currentView = 'overview' }: WorkflowMapProps) => {
+  // Initialize nodes and edges based on the current view
+  const getInitialData = useCallback(() => {
+    switch (currentView) {
+      case 'company':
+        return { nodes: companyNodes, edges: companyEdges };
+      case 'product':
+        return { nodes: productNodes, edges: productEdges };
+      case 'dashboard':
+        return { nodes: dashboardNodes, edges: dashboardEdges };
+      case 'overview':
+      default:
+        return { nodes: initialNodes, edges: initialEdges };
+    }
+  }, [currentView]);
+
+  const initialData = getInitialData();
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialData.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialData.edges);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [isDetailPanelOpen, setIsDetailPanelOpen] = useState(false);
+  
+  // Update nodes and edges when the view changes
+  useEffect(() => {
+    const { nodes: viewNodes, edges: viewEdges } = getInitialData();
+    setNodes(viewNodes);
+    setEdges(viewEdges);
+  }, [currentView, getInitialData, setNodes, setEdges]);
   
   const onConnect = useCallback((params: any) => {
     setEdges((eds) => addEdge({
@@ -101,6 +129,21 @@ const WorkflowMap = ({ focusedNode }: WorkflowMapProps) => {
     setIsDetailPanelOpen(false);
   };
 
+  // Get a title based on the current view
+  const getViewTitle = () => {
+    switch (currentView) {
+      case 'company':
+        return 'Company Level - Operating Framework';
+      case 'product':
+        return 'Product Level - Operating Framework';
+      case 'dashboard':
+        return 'Dashboard Structure - Operating Framework';
+      case 'overview':
+      default:
+        return 'Product & UX System';
+    }
+  };
+
   return (
     <div className="w-full h-[calc(100vh-100px)]">
       <ReactFlow
@@ -128,7 +171,7 @@ const WorkflowMap = ({ focusedNode }: WorkflowMapProps) => {
           maskColor="rgba(240, 240, 240, 0.7)"
         />
         <Panel position="top-left" className="bg-white p-3 rounded-md shadow-md">
-          <h3 className="text-xl font-bold mb-2">Product & UX System</h3>
+          <h3 className="text-xl font-bold mb-2">{getViewTitle()}</h3>
           <p className="text-sm text-gray-600">Click on nodes to explore connections and details</p>
           {selectedNode && (
             <button 

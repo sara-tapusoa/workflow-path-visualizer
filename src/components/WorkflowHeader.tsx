@@ -1,11 +1,17 @@
 
 import { useState } from 'react';
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from './ui/navigation-menu';
+import { cn } from '@/lib/utils';
+
+export type WorkflowView = 'overview' | 'company' | 'product' | 'dashboard';
 
 type WorkflowHeaderProps = {
   onFocusNode: (nodeId: string | null) => void;
+  onChangeView?: (view: WorkflowView) => void;
+  currentView?: WorkflowView;
 };
 
-export const WorkflowHeader = ({ onFocusNode }: WorkflowHeaderProps) => {
+export const WorkflowHeader = ({ onFocusNode, onChangeView, currentView = 'overview' }: WorkflowHeaderProps) => {
   const [expanded, setExpanded] = useState(false);
   
   const categories = [
@@ -23,12 +29,88 @@ export const WorkflowHeader = ({ onFocusNode }: WorkflowHeaderProps) => {
           <h1 className="text-2xl font-bold">Product & UX System</h1>
           <p className="text-gray-500">Shaping, Shipping and Syncing</p>
         </div>
-        <button 
-          className="bg-gray-100 hover:bg-gray-200 rounded-lg p-2"
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? 'Hide Details' : 'Show Details'}
-        </button>
+        <div className="flex gap-2">
+          {onChangeView && (
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="bg-gray-100 hover:bg-gray-200">
+                    {currentView === 'overview' ? 'Overview' : 
+                     currentView === 'company' ? 'Company Level' : 
+                     currentView === 'product' ? 'Product Level' : 
+                     'Dashboard Structure'}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[200px] gap-1 p-2">
+                      <li className="row-span-1">
+                        <NavigationMenuLink asChild>
+                          <button
+                            onClick={() => onChangeView('overview')}
+                            className={cn(
+                              "w-full flex select-none flex-col justify-end rounded-md p-2 no-underline outline-none focus:shadow-md",
+                              currentView === 'overview' ? "bg-gray-100" : "hover:bg-gray-100"
+                            )}
+                          >
+                            <div className="font-medium">Overview</div>
+                            <div className="text-sm text-gray-500">Complete system view</div>
+                          </button>
+                        </NavigationMenuLink>
+                      </li>
+                      <li className="row-span-1">
+                        <NavigationMenuLink asChild>
+                          <button
+                            onClick={() => onChangeView('company')}
+                            className={cn(
+                              "w-full flex select-none flex-col justify-end rounded-md p-2 no-underline outline-none focus:shadow-md",
+                              currentView === 'company' ? "bg-gray-100" : "hover:bg-gray-100"
+                            )}
+                          >
+                            <div className="font-medium">Company Level</div>
+                            <div className="text-sm text-gray-500">Strategic framework</div>
+                          </button>
+                        </NavigationMenuLink>
+                      </li>
+                      <li className="row-span-1">
+                        <NavigationMenuLink asChild>
+                          <button
+                            onClick={() => onChangeView('product')}
+                            className={cn(
+                              "w-full flex select-none flex-col justify-end rounded-md p-2 no-underline outline-none focus:shadow-md",
+                              currentView === 'product' ? "bg-gray-100" : "hover:bg-gray-100"
+                            )}
+                          >
+                            <div className="font-medium">Product Level</div>
+                            <div className="text-sm text-gray-500">Product implementation</div>
+                          </button>
+                        </NavigationMenuLink>
+                      </li>
+                      <li className="row-span-1">
+                        <NavigationMenuLink asChild>
+                          <button
+                            onClick={() => onChangeView('dashboard')}
+                            className={cn(
+                              "w-full flex select-none flex-col justify-end rounded-md p-2 no-underline outline-none focus:shadow-md",
+                              currentView === 'dashboard' ? "bg-gray-100" : "hover:bg-gray-100"
+                            )}
+                          >
+                            <div className="font-medium">Dashboard Structure</div>
+                            <div className="text-sm text-gray-500">Data views & metrics</div>
+                          </button>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          )}
+          <button 
+            className="bg-gray-100 hover:bg-gray-200 rounded-lg p-2"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? 'Hide Details' : 'Show Details'}
+          </button>
+        </div>
       </div>
       
       {expanded && (
