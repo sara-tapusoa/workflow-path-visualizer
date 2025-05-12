@@ -1,25 +1,35 @@
 
 import { useState, useCallback } from 'react';
 import WorkflowMap from '../components/WorkflowMap';
-import { WorkflowHeader } from '../components/WorkflowHeader';
+import { EnhancedWorkflowHeader } from '../components/EnhancedWorkflowHeader';
+import { EmbedDialog } from '../components/EmbedDialog';
 
 const Index = () => {
   const [focusedNode, setFocusedNode] = useState<string | null>(null);
+  const [embedDialogOpen, setEmbedDialogOpen] = useState(false);
   
   const handleFocusNode = useCallback((nodeId: string | null) => {
     setFocusedNode(nodeId);
   }, []);
 
+  const handleEmbedDialog = useCallback((isOpen: boolean) => {
+    setEmbedDialogOpen(isOpen);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4">
-        <WorkflowHeader onFocusNode={handleFocusNode} />
+        <EnhancedWorkflowHeader 
+          onFocusNode={handleFocusNode} 
+          onOpenEmbedDialog={() => handleEmbedDialog(true)} 
+        />
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <WorkflowMap focusedNode={focusedNode} />
         </div>
         <div className="mt-4 text-center text-sm text-gray-500">
           Click and drag to move the canvas. Use mouse wheel to zoom in/out.
         </div>
+        <EmbedDialog open={embedDialogOpen} onOpenChange={handleEmbedDialog} />
       </div>
     </div>
   );
